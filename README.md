@@ -11,3 +11,5 @@
 |  **book.bond(bond_name).attribute(C1).value() 是期权价值**  |
 |    **book.bond(bond_name).attribute(C12).value() 是PV**     |
 
+可转债套利空间的示例：
+

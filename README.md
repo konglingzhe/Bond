@@ -12,6 +12,4 @@
 |    **book.bond(bond_name).attribute(C2).value() 是PV**     |
 
 
-可转债套利空间的示例：
-
-https://github.com/FinTechNJU/ConvertibleBond/blob/master/output/128054.SZ.csv
+[可转债套利空间的示例](https://github.com/FinTechNJU/ConvertibleBond/blob/master/output/128054.SZ.csv)

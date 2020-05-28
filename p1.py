@@ -161,8 +161,8 @@ class GlobalFunctions:
         time_line = y1_series.index.tolist() #  ±º‰–Ú¡–
         y1 = y1_series.values.tolist()
         y2 = y2_series.values.tolist()
-        plt.plot(time_line, y1)
-        plt.plot(time_line, y2)
+        plt.plot(time_line, y1, label = 'Stock_Price')
+        plt.plot(time_line, y2, label = 'Value_Series')
         plt.legend()
         plt.show()
 # ============================================================================== #

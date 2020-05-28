@@ -96,6 +96,10 @@ class GetAtts:
         C = especially_small(C)
         return C
     @staticmethod
+    def get_C2(#TODO):
+
+        return C2
+    @staticmethod
     def get_C0(interest_list):
         def f(l,n):
             return np.power(1 + rf,n)
@@ -172,14 +176,16 @@ class GlobalFunctions:
         bond1 = book.bond(bond_name)
         # 实例化一个可转债对象
         bond1.attr('C0').add_value((GetAtts.get_C0(list1)))
-        # 设置属性C0的值
+        # 设置债券到期价值C0的值
         bond1.set_r(GetAtts.get_r(bond1.attr('C0').value))
         bond1.set_T(stock)
         # 传入r和T的值
         bond1.attr('T').add_value(GetAtts.get_T(stock))
         bond1.attr('K').add_value(K)
         bond1.attr('C1').add_value(GetAtts.get_C1(stock, bond1.r, K, bond1.T))
-        # 设置不同属性的值
+        # 设置期权价值C1 序列数据
+        bond1.attr('C2').add_value(GetAtts.get_C2(#TODO))
+        # 设置期纯债价值C2 序列数据
         value = bond1.attr('C1').value + bond1.attr('C0').value
         bond1.attr('Arbitrage').add_value(value - bond_price)
         # 设置可转债的套利属性

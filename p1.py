@@ -40,7 +40,8 @@ class GetAttributes:
     @staticmethod
     def get_r( interest_list, price, T):
         # r = (sum(interest_list) - price) / (price * T)
-        r = 0.02277500
+        # r = 0.02277500
+        r = np.power(sum(interest_list)/100, 1/6) - 1
         return r 
     @staticmethod
     def get_C1(stock, r, K):
@@ -122,9 +123,7 @@ if __name__=='__main__':
         dfRaw, dfRaw2 = GlobalFunctions.read_data()
     # 获得数据
 
-    r = 0.02277500 # 2020年5月27日的五年期的国债收益率
-    # 持有到期可获得收益率，[债券分红, 到期的溢价]，折算到现在
-    q = 0
+    q = 0 # q应该设置成什么我们也不知道
     book = Bondbook()
     # 设置可转债的基本指标
     # 对于所有可转债
@@ -132,6 +131,7 @@ if __name__=='__main__':
     list1=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5] # 债券1的利息表
     K1 = 37.97 # 债券1的行权价
     list2=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5]
+    K2 = 20.22 # 债券2的行权价
     # 对于每一个可转债
 
     GlobalFunctions.set_up(0, K1)

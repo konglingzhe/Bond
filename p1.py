@@ -21,6 +21,7 @@ class Attribute:
         return self._values[0]
 
 class Bond:
+    bond_name_list = []
     def __init__(self):
         self._attributes = {}
         self.r = np.nan
@@ -42,6 +43,7 @@ class Bondbook:
     def bond(self, name):
         if name not in self._bonds:
             self._bonds[name] = Bond()
+            Bond.bond_name_list.append(name)
         return self._bonds[name]
 
 # ============================================================================== #
@@ -111,6 +113,7 @@ class GlobalFunctions:
     @staticmethod
     def set_up(i, K):
         # 初始化每一个债券
+        # 从外部传入数据 TODO 改成函数，不要从文件中读取
         bond_price = dfRaw.iloc[:,i]
         bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
         stock = dfRaw2.iloc[:,i]
@@ -132,15 +135,12 @@ class GlobalFunctions:
         # 设置可转债的转股价值
         book.bond(bond_name).attribute('Premium_Rate').add_value(GetAttributes.get_Premium_Rate(bond_price, book.bond(bond_name).attribute('Value_Series').value()))
         # 设置可转债的转股溢价率
-        book.bond(bond_name).attribute('Stock_Price').add_value(stock)
-        # 设置正股股价
+        book.bond(bond_name).attribute('Stock_Price').add_value(stock)# 设置正股股价
+        book.bond(bond_name).attribute('Bond_Price').add_value(bond_price)# 设置可转债价格
     @staticmethod
     def save_info(i):
-        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
-        temp = book.bond(bond_name).attribute('Arbitrage').value()
-        # print(temp)
-        # 输出可转债的套利空间
-        temp.to_csv('./output/'+bond_name+'.csv',mode='w+')
+        bond_name = Bond.bond_name_list[i]
+        book.bond(bond_name).attribute('Arbitrage').value().to_csv('./output/'+bond_name+'.csv',mode='w+')
         # 可转债的套利空间保存为csv文件
     @staticmethod
     def read_data():
@@ -152,7 +152,7 @@ class GlobalFunctions:
     @staticmethod
     def draw_scatter(i):
         # 正股股价和溢价率的散点图
-        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
+        bond_name = Bond.bond_name_list[i]
         temp_bond = book.bond(bond_name) # 获得指定债券的实例
         x = temp_bond.attribute('Stock_Price').value()
         y = temp_bond.attribute('Premium_Rate').value()
@@ -162,7 +162,7 @@ class GlobalFunctions:
         plt.show()
     @staticmethod
     def draw_line(i):
-        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
+        bond_name = Bond.bond_name_list[i]
         temp_bond = book.bond(bond_name) # 获得指定债券的实例
         y1_series = temp_bond.attribute('Stock_Price').value() # 正股价格
         y2_series = temp_bond.attribute('Value_Series').value() # 转股价值
@@ -174,10 +174,13 @@ class GlobalFunctions:
         plt.legend()
         plt.show()
     @staticmethod
+    def draw_figure(i):
+        GlobalFunctions.draw_scatter(i)
+        # GlobalFunctions.draw_line(i)
+    @staticmethod
     def show_info(i):
-            GlobalFunctions.save_info(i)
-            GlobalFunctions.draw_scatter(i)
-            GlobalFunctions.draw_line(i)
+        GlobalFunctions.save_info(i)
+        GlobalFunctions.draw_figure(i)
 
 # ============================================================================== #
 

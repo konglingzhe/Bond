@@ -12,7 +12,8 @@
 |    **book.bond(bond_name).attribute(C2).value() 是PV**     |
 
 [可转债套利空间的示例](https://github.com/FinTechNJU/ConvertibleBond/blob/master/output/128054.SZ.csv)
-[代码地址, 点击此链接](https://github.com/FinTechNJU/Bond/blob/master/p1.py)  
+
+[计算可转债价值和生成以下两个图片(折线图和散点图)代码地址, 点击此链接](https://github.com/FinTechNJU/Bond/blob/master/p1.py)  
 
 存在问题：r 如何计算
 

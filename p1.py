@@ -1,4 +1,5 @@
 # %%
+import concurrent
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -6,6 +7,8 @@ import scipy.stats as stats
 import collections
 dfRaw, dfRaw2 = pd.DataFrame(), pd.DataFrame()
 # 全局变量
+
+# ============================================================================== #
 # 以下是容器
 class Attribute:
     def __init__(self):
@@ -40,6 +43,7 @@ class Bondbook:
         if name not in self._bonds:
             self._bonds[name] = Bond()
         return self._bonds[name]
+
 # ============================================================================== #
 # 以下是函数
 class GetAttributes:
@@ -100,6 +104,9 @@ class GetAttributes:
     def get_Premium_Rate(bond_price, Value_Series):
         Premium_Rate = (bond_price - Value_Series)/ Value_Series
         return Premium_Rate
+
+# ------------------------------------------------------------------------------ #       
+ 
 class GlobalFunctions:
     @staticmethod
     def set_up(i, K):
@@ -135,11 +142,12 @@ class GlobalFunctions:
         # 输出可转债的套利空间
         temp.to_csv('./output/'+bond_name+'.csv',mode='w+')
         # 可转债的套利空间保存为csv文件
-        print("Done")
     @staticmethod
     def read_data():
-        dfRaw = pd.read_csv('./excel1.csv',encoding='gbk').set_index('DateTime')
-        dfRaw2 = pd.read_csv('./excel2.csv',encoding='gbk').set_index('DateTime')
+        name_list = ['excel1', 'excel2']
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(name_list)) as executor: # 并行读入文件
+            results = list(executor.map(lambda file_name: pd.read_csv('./'+file_name+'.csv',encoding='gbk').set_index('DateTime'), name_list))
+        dfRaw, dfRaw2 = results[0], results[1]
         return dfRaw, dfRaw2
     @staticmethod
     def draw_scatter(i):
@@ -165,6 +173,12 @@ class GlobalFunctions:
         plt.plot(time_line, y2, label = 'Value_Series')
         plt.legend()
         plt.show()
+    @staticmethod
+    def show_info(i):
+            GlobalFunctions.save_info(i)
+            GlobalFunctions.draw_scatter(i)
+            GlobalFunctions.draw_line(i)
+
 # ============================================================================== #
 
 if __name__=='__main__':
@@ -185,8 +199,6 @@ if __name__=='__main__':
     # 对于每一个可转债
 
     GlobalFunctions.set_up(0, K1)
-    GlobalFunctions.save_info(0)
-    GlobalFunctions.draw_scatter(0)
-    GlobalFunctions.draw_line(0)
-
+    GlobalFunctions.show_info(0)
+    print("Done")
 # %%

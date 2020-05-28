@@ -35,11 +35,19 @@ dataRaw = read_data(name_list)
 from concurrent.futures import *
 import pandas as pd
 name_list = ['excel1', 'excel2']
-def read_it(file_name):
+def f(file_name):
     output = pd.read_csv('./'+file_name+'.csv',encoding='gbk').set_index('DateTime')
     return output
 pool = ProcessPoolExecutor(max_workers=2)
 results = list(pool.map(read_it, name_list))
 
+
+# %%
+import concurrent
+
+import pandas as pd
+name_list = ['excel1', 'excel2']
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(lambda file_name: pd.read_csv('./'+file_name+'.csv',encoding='gbk').set_index('DateTime'), name_list))
 
 # %%

@@ -1,5 +1,5 @@
 # %%
-from concurrent.futures import *
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import scipy.stats as stats
@@ -121,12 +121,14 @@ class GlobalFunctions:
         value = book.bond(bond_name).attribute('C1').value() + book.bond(bond_name).attribute('C2').value()
         bond1.attribute('Arbitrage').add_value(value - bond_price)
         # 设置可转债的套利属性
-        value = book.bond(bond_name).attribute('Value_Series').add_value(GetAttributes.get_Value_Series(K, stock))
+        book.bond(bond_name).attribute('Value_Series').add_value(GetAttributes.get_Value_Series(K, stock))
         # 设置可转债的转股价值
-        value = book.bond(bond_name).attribute('Premium_Rate').add_value(GetAttributes.get_Premium_Rate(bond_price, book.bond(bond_name).attribute('Value_Series').value()))
+        book.bond(bond_name).attribute('Premium_Rate').add_value(GetAttributes.get_Premium_Rate(bond_price, book.bond(bond_name).attribute('Value_Series').value()))
         # 设置可转债的转股溢价率
+        book.bond(bond_name).attribute('Stock_Price').add_value(stock)
+        # 设置正股股价
     @staticmethod
-    def show_info(i):
+    def save_info(i):
         bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
         temp = book.bond(bond_name).attribute('Arbitrage').value()
         # print(temp)
@@ -140,11 +142,29 @@ class GlobalFunctions:
         dfRaw2 = pd.read_csv('./excel2.csv',encoding='gbk').set_index('DateTime')
         return dfRaw, dfRaw2
     @staticmethod
-    def draw():
-        def draw_scatter():
-            pass
-        pass
-
+    def draw_scatter(i):
+        # 正股股价和溢价率的散点图
+        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
+        temp_bond = book.bond(bond_name) # 获得指定债券的实例
+        x = temp_bond.attribute('Stock_Price').value()
+        y = temp_bond.attribute('Premium_Rate').value()
+        plt.scatter(x, y)
+        plt.xlabel('Stock_Price')
+        plt.ylabel('Premium_Rate')
+        plt.show()
+    @staticmethod
+    def draw_line(i):
+        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
+        temp_bond = book.bond(bond_name) # 获得指定债券的实例
+        y1_series = temp_bond.attribute('Stock_Price').value() # 正股价格
+        y2_series = temp_bond.attribute('Value_Series').value() # 转股价值
+        time_line = y1_series.index.tolist() # 时间序列
+        y1 = y1_series.values.tolist()
+        y2 = y2_series.values.tolist()
+        plt.plot(time_line, y1)
+        plt.plot(time_line, y2)
+        plt.legend()
+        plt.show()
 # ============================================================================== #
 
 if __name__=='__main__':
@@ -165,6 +185,8 @@ if __name__=='__main__':
     # 对于每一个可转债
 
     GlobalFunctions.set_up(0, K1)
-    GlobalFunctions.show_info(0)
+    GlobalFunctions.save_info(0)
+    GlobalFunctions.draw_scatter(0)
+    GlobalFunctions.draw_line(0)
 
 # %%

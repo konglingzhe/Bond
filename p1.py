@@ -205,3 +205,11 @@ if __name__=='__main__':
     GlobalFunctions.show_info(0)
     print("Done")
 # %%
+# %%
+K1 = 37.97 # 债券1的行权价 
+# 序列数据
+
+# 时间序列上的股价x和债券价y的散点图
+k变化会有表
+
+rf是全局变量

@@ -1,35 +1,32 @@
-# %%
 import concurrent
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import scipy.stats as stats
-import collections
 dfRaw, dfRaw2 = pd.DataFrame(), pd.DataFrame()
-# È«¾Ö±äÁ¿
+# å…¨å±€å˜é‡
 
 # ============================================================================== #
-# ÒÔÏÂÊÇÈİÆ÷
-class Attribute:
+# ä»¥ä¸‹æ˜¯å®¹å™¨
+class Attr:
+    '''Attribute
+    '''
     def __init__(self):
-        self._values = []
+        self.value = None
     
     def add_value(self, value):
-        self._values.append(value)
-    
-    def value(self):
-        return self._values[0]
+        self.value = value 
 
 class Bond:
     bond_name_list = []
     def __init__(self):
-        self._attributes = {}
+        self._attrs = {}
         self.r = np.nan
         self.T = np.nan
-    def attribute(self, name):
-        if name not in self._attributes:
-            self._attributes[name] = Attribute()
-        return self._attributes[name]    
+    def attr(self, name):
+        if name not in self._attrs:
+            self._attrs[name] = Attr()
+        return self._attrs[name]    
     def set_r(self, r):
         self.r = r
         return self.r
@@ -47,21 +44,31 @@ class Bondbook:
         return self._bonds[name]
 
 # ============================================================================== #
-# ÒÔÏÂÊÇº¯Êı
-class GetAttributes:
+# ä»¥ä¸‹æ˜¯å‡½æ•°
+class GetAtts:
     @staticmethod
-    def get_r( interest_list, price, T):
-        # r = (sum(interest_list) - price) / (price * T)
-        # r = 0.02277500
-        r = np.power(sum(interest_list)/100, 1/6) - 1
+    def get_r(C0):
+        r = np.power(C0/100, 1/6) - 1
         return r 
     @staticmethod
     def get_T( stock):
-        # ÕâÀïÒªÇó¹ÉÆ±µÄ¿ªÊ¼Ê±¼ä±ØĞëºÍÕ®È¯µÄ¿ªÊ¼Ê±¼äÏàÍ¬
+        # è¿™é‡Œè¦æ±‚è‚¡ç¥¨çš„å¼€å§‹æ—¶é—´å¿…é¡»å’Œå€ºåˆ¸çš„å¼€å§‹æ—¶é—´ç›¸åŒ
         total_year_length = 6
         passed_year_length = len(stock)/250
         T = total_year_length - passed_year_length
         return T
+    @staticmethod
+    def get_K(time_list, time_price_dict):
+        '''å¾—åˆ°æ—¶é—´åºåˆ—K
+        Args:
+            time_list: list, stock.index.values.tolist()
+            time_price_dict: dict, {'2019-02-15':37.97, '2019-08-22':22.22}
+        '''
+        K = pd.DataFrame(index = time_list, data = [np.nan for i in range(len(time_list))])
+        for key, value in time_price_dict.items():
+            K.loc[key] = value
+        K.fillna(method='ffill')
+        return K
     @staticmethod
     def get_C1(stock, r, K, T):
         def get_sigma(stock): 
@@ -89,9 +96,9 @@ class GetAttributes:
         C = especially_small(C)
         return C
     @staticmethod
-    def get_C2(interest_list, r):
+    def get_C0(interest_list):
         def f(l,n):
-            return l/np.power(1 + r,n)
+            return np.power(1 + rf,n)
         total = 0 
         for i, item in enumerate(interest_list):
             l = item
@@ -111,51 +118,24 @@ class GetAttributes:
  
 class GlobalFunctions:
     @staticmethod
-    def set_up(i, K):
-        # ³õÊ¼»¯Ã¿Ò»¸öÕ®È¯
-        # ´ÓÍâ²¿´«ÈëÊı¾İ TODO ¸Ä³Éº¯Êı£¬²»Òª´ÓÎÄ¼şÖĞ¶ÁÈ¡
-        bond_price = dfRaw.iloc[:,i]
-        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
-        stock = dfRaw2.iloc[:,i]
-        # ËùÓĞ¿É×ªÕ®
-        bond1 = book.bond(bond_name)
-        # Ê¾Àı»¯Ò»¸ö¿É×ªÕ®¶ÔÏó
-        book.bond(bond_name).set_r(GetAttributes.get_r(list1, bond_price , len(stock)))
-        book.bond(bond_name).set_T(stock)
-        # ´«ÈërºÍTµÄÖµ
-        bond1.attribute('T').add_value(GetAttributes.get_T(stock))
-        bond1.attribute('K').add_value(K)
-        bond1.attribute('C1').add_value(GetAttributes.get_C1(stock, book.bond(bond_name).r, K, book.bond(bond_name).T))
-        bond1.attribute('C2').add_value((GetAttributes.get_C2(list1, book.bond(bond_name).r)))
-        # ÉèÖÃ²»Í¬ÊôĞÔµÄÖµ
-        value = book.bond(bond_name).attribute('C1').value() + book.bond(bond_name).attribute('C2').value()
-        bond1.attribute('Arbitrage').add_value(value - bond_price)
-        # ÉèÖÃ¿É×ªÕ®µÄÌ×ÀûÊôĞÔ
-        book.bond(bond_name).attribute('Value_Series').add_value(GetAttributes.get_Value_Series(K, stock))
-        # ÉèÖÃ¿É×ªÕ®µÄ×ª¹É¼ÛÖµ
-        book.bond(bond_name).attribute('Premium_Rate').add_value(GetAttributes.get_Premium_Rate(bond_price, book.bond(bond_name).attribute('Value_Series').value()))
-        # ÉèÖÃ¿É×ªÕ®µÄ×ª¹ÉÒç¼ÛÂÊ
-        book.bond(bond_name).attribute('Stock_Price').add_value(stock)# ÉèÖÃÕı¹É¹É¼Û
-        book.bond(bond_name).attribute('Bond_Price').add_value(bond_price)# ÉèÖÃ¿É×ªÕ®¼Û¸ñ
-    @staticmethod
     def save_info(i):
         bond_name = Bond.bond_name_list[i]
-        book.bond(bond_name).attribute('Arbitrage').value().to_csv('./output/'+bond_name+'.csv',mode='w+')
-        # ¿É×ªÕ®µÄÌ×Àû¿Õ¼ä±£´æÎªcsvÎÄ¼ş
+        book.bond(bond_name).attr('Arbitrage').value.to_csv('./output/'+bond_name+'.csv',mode='w+')
+        # å¯è½¬å€ºçš„å¥—åˆ©ç©ºé—´ä¿å­˜ä¸ºcsvæ–‡ä»¶
     @staticmethod
     def read_data():
         name_list = ['excel1', 'excel2']
-        with concurrent.futures.ThreadPoolExecutor(max_workers=len(name_list)) as executor: # ²¢ĞĞ¶ÁÈëÎÄ¼ş
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(name_list)) as executor: # å¹¶è¡Œè¯»å…¥æ–‡ä»¶
             results = list(executor.map(lambda file_name: pd.read_csv('./'+file_name+'.csv',encoding='gbk').set_index('DateTime'), name_list))
         dfRaw, dfRaw2 = results[0], results[1]
         return dfRaw, dfRaw2
     @staticmethod
     def draw_scatter(i):
-        # Õı¹É¹É¼ÛºÍÒç¼ÛÂÊµÄÉ¢µãÍ¼
+        # æ­£è‚¡è‚¡ä»·å’Œæº¢ä»·ç‡çš„æ•£ç‚¹å›¾
         bond_name = Bond.bond_name_list[i]
-        temp_bond = book.bond(bond_name) # »ñµÃÖ¸¶¨Õ®È¯µÄÊµÀı
-        x = temp_bond.attribute('Stock_Price').value()
-        y = temp_bond.attribute('Premium_Rate').value()
+        temp_bond = book.bond(bond_name) # è·å¾—æŒ‡å®šå€ºåˆ¸çš„å®ä¾‹
+        x = temp_bond.attr('Stock_Price').value
+        y = temp_bond.attr('Premium_Rate').value
         plt.scatter(x, y)
         plt.xlabel('Stock_Price')
         plt.ylabel('Premium_Rate')
@@ -163,10 +143,10 @@ class GlobalFunctions:
     @staticmethod
     def draw_line(i):
         bond_name = Bond.bond_name_list[i]
-        temp_bond = book.bond(bond_name) # »ñµÃÖ¸¶¨Õ®È¯µÄÊµÀı
-        y1_series = temp_bond.attribute('Stock_Price').value() # Õı¹É¼Û¸ñ
-        y2_series = temp_bond.attribute('Value_Series').value() # ×ª¹É¼ÛÖµ
-        time_line = y1_series.index.tolist() # Ê±¼äĞòÁĞ
+        temp_bond = book.bond(bond_name) # è·å¾—æŒ‡å®šå€ºåˆ¸çš„å®ä¾‹
+        y1_series = temp_bond.attr('Stock_Price').value # æ­£è‚¡ä»·æ ¼
+        y2_series = temp_bond.attr('Value_Series').value # è½¬è‚¡ä»·å€¼
+        time_line = y1_series.index.tolist() # æ—¶é—´åºåˆ—
         y1 = y1_series.values.tolist()
         y2 = y2_series.values.tolist()
         plt.plot(time_line, y1, label = 'Stock_Price')
@@ -181,27 +161,56 @@ class GlobalFunctions:
     def show_info(i):
         GlobalFunctions.save_info(i)
         GlobalFunctions.draw_figure(i)
+    @staticmethod
+    def set_up(i, K):
+        # åˆå§‹åŒ–æ¯ä¸€ä¸ªå€ºåˆ¸
+        # ä»å¤–éƒ¨ä¼ å…¥æ•°æ® TODO æ”¹æˆå‡½æ•°ï¼Œä¸è¦ä»æ–‡ä»¶ä¸­è¯»å–
+        bond_price = dfRaw.iloc[:,i]
+        bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
+        stock = dfRaw2.iloc[:,i]
+        # æ‰€æœ‰å¯è½¬å€º
+        bond1 = book.bond(bond_name)
+        # å®ä¾‹åŒ–ä¸€ä¸ªå¯è½¬å€ºå¯¹è±¡
+        bond1.attr('C0').add_value((GetAtts.get_C0(list1)))
+        # è®¾ç½®å±æ€§C0çš„å€¼
+        bond1.set_r(GetAtts.get_r(bond1.attr('C0').value))
+        bond1.set_T(stock)
+        # ä¼ å…¥rå’ŒTçš„å€¼
+        bond1.attr('T').add_value(GetAtts.get_T(stock))
+        bond1.attr('K').add_value(K)
+        bond1.attr('C1').add_value(GetAtts.get_C1(stock, bond1.r, K, bond1.T))
+        # è®¾ç½®ä¸åŒå±æ€§çš„å€¼
+        value = bond1.attr('C1').value + bond1.attr('C0').value
+        bond1.attr('Arbitrage').add_value(value - bond_price)
+        # è®¾ç½®å¯è½¬å€ºçš„å¥—åˆ©å±æ€§
+        bond1.attr('Value_Series').add_value(GetAtts.get_Value_Series(K, stock))
+        # è®¾ç½®å¯è½¬å€ºçš„è½¬è‚¡ä»·å€¼
+        bond1.attr('Premium_Rate').add_value(GetAtts.get_Premium_Rate(bond_price, bond1.attr('Value_Series').value))
+        # è®¾ç½®å¯è½¬å€ºçš„è½¬è‚¡æº¢ä»·ç‡
+        bond1.attr('Stock_Price').add_value(stock)# è®¾ç½®æ­£è‚¡è‚¡ä»·
+        bond1.attr('Bond_Price').add_value(bond_price)# è®¾ç½®å¯è½¬å€ºä»·æ ¼
 
 # ============================================================================== #
 
 if __name__=='__main__':
-    # Ö÷º¯Êı 
+    # ä¸»å‡½æ•° 
     if (len(dfRaw)==0) or (len(dfRaw2)==0):
         dfRaw, dfRaw2 = GlobalFunctions.read_data()
-    # »ñµÃÊı¾İ
+    # è·å¾—æ•°æ®
 
-    q = 0 # qÓ¦¸ÃÉèÖÃ³ÉÊ²Ã´ÎÒÃÇÒ²²»ÖªµÀ
+    q = 0 # qåº”è¯¥è®¾ç½®æˆä»€ä¹ˆæˆ‘ä»¬ä¹Ÿä¸çŸ¥é“
+    rf = 0.022956 # è®¾ç½®æ— é£é™©åˆ©ç‡
     book = Bondbook()
-    # ÉèÖÃ¿É×ªÕ®µÄ»ù±¾Ö¸±ê
-    # ¶ÔÓÚËùÓĞ¿É×ªÕ®
+    # è®¾ç½®å¯è½¬å€ºçš„åŸºæœ¬æŒ‡æ ‡
+    # å¯¹äºæ‰€æœ‰å¯è½¬å€º
 
-    list1=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5] # Õ®È¯1µÄÀûÏ¢±í
-    K1 = 37.97 # Õ®È¯1µÄĞĞÈ¨¼Û
+    list1=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5] # å€ºåˆ¸1çš„åˆ©æ¯è¡¨
+    K1 = 37.97 # å€ºåˆ¸1çš„è¡Œæƒä»·
     list2=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5]
-    K2 = 20.22 # Õ®È¯2µÄĞĞÈ¨¼Û
-    # ¶ÔÓÚÃ¿Ò»¸ö¿É×ªÕ®
+    K2 = 20.22 # å€ºåˆ¸2çš„è¡Œæƒä»·
+    # å¯¹äºæ¯ä¸€ä¸ªå¯è½¬å€º
 
     GlobalFunctions.set_up(0, K1)
     GlobalFunctions.show_info(0)
     print("Done")
-# %%
+

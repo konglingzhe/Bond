@@ -11,7 +11,7 @@ class GlobalFunctions:
         bars = data.iloc[:,1].values.tolist()
         change = data.iloc[:,0].values.tolist()
         bar = (
-            Bar(init_opts=opts.InitOpts(width="2100px", height="1000px"))
+            Bar(init_opts=opts.InitOpts(width="2700px", height="1000px"))
             .add_xaxis(xaxis_data=x_data)
             .add_yaxis(
                 series_name="Stock_Price",

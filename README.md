@@ -31,8 +31,7 @@
 
 
 
-
-![](asset/image-20200530013008868-0773878.png)
+![pix](asset/pix.png)
 
 * 正股股(Stock_Price)...转股价值(Value_Series)...折线图 -----> [Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) <-----
 

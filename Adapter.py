@@ -38,7 +38,7 @@ class GlobalFunctions:
                     type_="value",
                     axistick_opts=opts.AxisTickOpts(is_show=True),
                     splitline_opts=opts.SplitLineOpts(is_show=True),
-                    axislabel_opts=opts.LabelOpts(formatter="{value} 只股"),
+                    axislabel_opts=opts.LabelOpts(formatter="￥ {value}"),
                 ),
                 datazoom_opts=[
                     opts.DataZoomOpts(range_start=0, range_end=100),

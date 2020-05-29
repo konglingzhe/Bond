@@ -11,19 +11,19 @@ class GetAttrs:
     @staticmethod
     def get_C0(interest_list):
         '''债券到期的终值
-        #TODO根据付息日不同，应该有六个值 
+        #TODO根据付息日不同，应该有六个值
         '''
         length = len(interest_list)
         def f(l,n):
             return l*np.power(1 + GetAttrs.rf, length - n)
-        total = 0 
+        total = 0
         for i, item in enumerate(interest_list):
             total += f(item,i+1)
         return total
     @staticmethod
     def get_r(C0):
         r = np.power(C0/100, 1/6) - 1
-        return r 
+        return r
     @staticmethod
     def get_T(time_list, stock):
         ''' 债券的存续时间序列
@@ -53,7 +53,7 @@ class GetAttrs:
         for key, value in time_price_dict.items():
             K.loc[key] = value
         K = K.fillna(method='ffill')
-        return K  
+        return K
     @staticmethod
     def get_sgima(stock_df):
         '''获得股票的波动率，序列数据
@@ -64,7 +64,6 @@ class GetAttrs:
         miu = stock_ln_df.diff().fillna(method='bfill')
         sigma_df = pd.DataFrame(index= stock_df.index.values.tolist(), columns=['simga'])
         for i in range(2, sigma_df.shape[0]):
-            print(i)
             temp_miu = miu.iloc[1:i+1]
             temp_miu_avr = temp_miu.mean()
             total = 0
@@ -76,7 +75,7 @@ class GetAttrs:
 
     @staticmethod
     def get_C1(stock, r, K, T):
-        def get_sigma(stock): 
+        def get_sigma(stock):
             stock_ln = np.log(stock)
             miu = stock_ln.diff()
             miu = miu.iloc[1:]
@@ -92,19 +91,15 @@ class GetAttrs:
                 if item < 1e-4:
                     C.iat[i] = 0
             return C
-        def check_if_series(x):
-            if type(x) != pd.core.series.Series:
-                x = pd.Series(index=x.index.values.tolist(),data=x.iloc[:,0])
-            return x            
         sigma_y = get_sigma(stock)
-        K = check_if_series(K)
-        T = check_if_series(GlobalFunctions.series_align(K, T))
-        front = check_if_series(np.log(stock / K))
-        back = check_if_series((T * (r + np.power(sigma_y,2)/2)))
+        K = GlobalFunctions.check_if_series(K)
+        T = GlobalFunctions.check_if_series(GlobalFunctions.series_align(K, T))
+        front = GlobalFunctions.check_if_series(np.log(stock / K))
+        back = GlobalFunctions.check_if_series((T * (r + np.power(sigma_y,2)/2)))
         up = front + back
         down = sigma_y * np.power(T, 0.5)
         d1 = up / down
-        d2 = d1 - down       
+        d2 = d1 - down
         C = stock * stats.norm(0,1).cdf(d1.astype(float)) - K* np.exp((-1*r*T).astype(float)) * stats.norm(0,1).cdf(d2.astype(float))
         C = especially_small(C)
         return C
@@ -118,9 +113,10 @@ class GetAttrs:
         C2 = pd.Series(index = T.index.values.tolist())
         for i in range(T.shape[0]):
             C2.iat[i] = C0 / np.power((1 + GetAttrs.rf), T.iloc[i,0])
-        return C2          
+        return C2
     @staticmethod
     def get_Value_Series(K, stock):
+        K = GlobalFunctions.check_if_series(K)
         Value_Series = (100/K) * stock
         return Value_Series
     @staticmethod

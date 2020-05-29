@@ -36,13 +36,13 @@
 
  ![正股股(Stock_Price)...转股价值(Value_Series)...折线图](asset/正股股(Stock_Price)...转股价值(Value_Series)...折线图.png) 
 
-```
+```python
 正股股(Stock_Price)...转股价值(Value_Series)...折线图   
 ```
 
  ![正股股价(x)...溢价率(y)...散点图](asset/正股股价(x)...溢价率(y)...散点图.png) 
 
-```
+```python
        正股股价(x)...溢价率(y)...散点图               
 ```
 
@@ -78,3 +78,9 @@
 * 纯债的价值C2
 * 纯债的价值是递增的？？
 * 是的。因为两个到期价值一样的债券，更快到期的，获利能力更强，应该价值越大。
+
+![image-20200530013008868](/Users/terrystanley/Library/Application Support/typora-user-images/image-20200530013008868.png)
+
+```python
+正股股(Stock_Price)...转股价值(Value_Series)...[折线图]()  
+```

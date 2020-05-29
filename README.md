@@ -34,12 +34,7 @@
 
 ![](asset/image-20200530013008868-0773878.png)
 
-* 正股股(Stock_Price)...转股价值(Value_Series)...折线图 ...... ...... [Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) 
-
- ![正股股(Stock_Price)...转股价值(Value_Series)...折线图](asset/正股股(Stock_Price)...转股价值(Value_Series)...折线图.png) 
-
-
-* ....... 正股股(Stock_Price)...转股价值(Value_Series)...折线图 .......  
+* 正股股(Stock_Price)...转股价值(Value_Series)...折线图 ...... ...... [Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) ...... ......
 
 
  ![正股股价(x)...溢价率(y)...散点图](asset/正股股价(x)...溢价率(y)...散点图.png) 

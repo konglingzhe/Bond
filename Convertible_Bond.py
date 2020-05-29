@@ -4,7 +4,7 @@ Created on Fri May 28 09:16:58 2020
 
 @author: Github@FinTechNJU
 
-设计模式：适配器模式
+Design Pattern: Adapter Pattern
 """
 import pandas as pd
 # ============================================================================== #
@@ -12,8 +12,8 @@ from Container import Bondbook
 from Function import GetAttrs
 from Adapter import GlobalFunctions
 # ============================================================================== #
-# 全局变量
 dfRaw, dfRaw2 = pd.DataFrame(), pd.DataFrame()
+# 全局变量
 # ============================================================================== #
 class SetUp:
     @staticmethod

@@ -1,16 +1,21 @@
 import pandas as pd
 # ============================================================================== #
 from Container import Bondbook
-import GetAttrs
-import GlobalFunctions
+from Function import GetAttrs
+from Adapter import GlobalFunctions
 # ============================================================================== #
 # 全局变量
 dfRaw, dfRaw2 = pd.DataFrame(), pd.DataFrame()
 # ============================================================================== #
 class SetUp:
     @staticmethod
-    def set_up(i, K_dict):
-        # 初始化每一个债券
+    def set_up(i, K_dict, time_list):
+        '''初始化每一个债券
+        Args:
+            i: 表中位置，后续要改掉
+            K_dict: dict, 行权价的时间字典
+            time_list: list, 债券开始时间和结束时间列表
+        '''       
         # 从外部传入数据 TODO 改成函数，不要从文件中读取
         bond_price = dfRaw.iloc[:,i]
         bond_name = pd.DataFrame(dfRaw.iloc[:,i]).columns.tolist()[0]
@@ -25,11 +30,11 @@ class SetUp:
         bond1.attr('r').add_value(GetAttrs.get_r(bond1.attr('C0').value))
         # 设置可转债的收益率，单值数据
         
-#        bond1.attr('T').add_value(GetAttrs.get_T(#TODO))
-#        # 设置可转债的到期年限，序列数据
-#        
-#        bond1.attr('sigma').add_value(GetAttrs.get_sgima(#TODO))
-#        # 设置可转债的波动率，序列数据
+        bond1.attr('T').add_value(GetAttrs.get_T(time_list))
+        # 设置可转债的到期年限，序列数据
+        
+        bond1.attr('sigma').add_value(GetAttrs.get_sgima(stock))
+        # 设置可转债的波动率，序列数据
         
         bond1.attr('K').add_value(GetAttrs.get_K(stock.index.values.tolist(), K_dict)) 
         # 设置期权的行权价K TODO 序列数据
@@ -70,11 +75,13 @@ if __name__=='__main__':
          '2020-05-22':22.22
          }
     # 债券1的行权价
+    time_list = ['2019-02-15', '2025-02-15']
+    # 债券1的开始时间和结束时间
     list2=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5]
     K2 = 20.22 # 债券2的行权价
     # 对于每一个可转债
 
-    SetUp.set_up(0, K1_dict)
+    SetUp.set_up(0, K1_dict, time_list)
     GlobalFunctions.show_info(0)
     print("Done")
 

@@ -1,22 +1,34 @@
 # 以下是函数
-import math
+#import math
 import scipy.stats as stats
 import pandas as pd
 import numpy as np
 class GetAttrs:
-    rf = 0.022956 # 设置无风险利率
+    '''计算得到，容器Bond内的属性，用容器Attr容纳
+    '''
+    rf = 0.022956 # 设置无风险利率，类属性
+    @staticmethod
+    def get_C0(interest_list):
+        length = len(interest_list)
+        def f(l,n):
+            return l*np.power(1 + GetAttrs.rf, length - n)
+        total = 0 
+        for i, item in enumerate(interest_list):
+            total += f(item,i+1)
+        return total
     @staticmethod
     def get_r(C0):
         r = np.power(C0/100, 1/6) - 1
         return r 
     @staticmethod
-    def get_T(start_point_string, end_point_string):
+    def get_T(time_list):
         ''' 这里要求股票的开始时间必须和债券的开始时间相同
         Args:
             start_point_string: string, 债券开始的时间，eg: start_point_string = '2019-02-15'
             end_point_string: string, 债券结束时间，eg: end_point_string = '2025-02-15'
         '''
-        date_index = pd.date_range(start_point_string, end_point_string)
+        start_point_string, end_point_string = time_list[0], time_list[1]
+        date_index = pd.date_range(start_point_string, end_point_string).strftime('%Y-%m-%d')
         T = pd.DataFrame(index = date_index ,columns = ['T'])
         for i in range(T.shape[0]):
             T.iat[i,0] = (len(date_index)- (i+1))/365.333
@@ -40,114 +52,68 @@ class GetAttrs:
             stock_df: 正股的收盘价
         '''
         stock_ln_df = np.log(stock_df)
-        miu = stock_ln_df.diff().iloc[1:]
+        miu = stock_ln_df.diff().fillna(method='bfill')
         sigma_df = pd.DataFrame(index= stock_df.index.values.tolist(), columns=['simga'])
-        for i in range(sigma_df.shape[0]):
-            temp_miu = miu.iloc[i:]
+        for i in range(2, sigma_df.shape[0]):
+            print(i)
+            temp_miu = miu.iloc[1:i+1]
             temp_miu_avr = temp_miu.mean()
             total = 0
             for j in range(len(temp_miu)):
-                total += np.power(temp_miu.iloc[i] - temp_miu_avr, 2)
+                total += np.power(temp_miu.iloc[j] - temp_miu_avr, 2)
             total = np.sqrt(total/(len(temp_miu) - 1))
             sigma_df.iat[i,0] = total
-        sigma_df.fillna(method='ffill')
-        return sigma_df
+        return sigma_df.fillna(method='bfill')
+
+    @staticmethod
+    def get_C1(stock, r, K, T):
+        def get_sigma(stock): 
+            stock_ln = np.log(stock)
+            miu = stock_ln.diff()
+            miu = miu.iloc[1:]
+            miu_avr = miu.mean()
+            total=0
+            for i in range(len(miu)):
+                total += np.power(miu.iloc[i] - miu_avr,2)
+            sigma = np.sqrt(total/(len(miu)-1))
+            sigma_total = sigma * np.sqrt(250)
+            return sigma_total
+        def especially_small(C):
+            for i, item in enumerate(C.values.tolist()):
+                if item < 1e-4:
+                    C.iat[i] = 0
+            return C
+        def check_if_series(x):
+            if type(x) != pd.core.series.Series:
+                x = pd.Series(index=x.index.values.tolist(),data=x.iloc[:,0])
+            return x            
+        def series_align(K, T):
+            '''让T的index保持与K对齐
+            '''
+            index_list = K.index.values.tolist()
+            T = T.reindex(index_list)
+            return T
+        sigma_y = get_sigma(stock)
+        K = check_if_series(K)
+        T = check_if_series(series_align(K, T))
+        front = check_if_series(np.log(stock / K))
+        back = check_if_series((T * (r + np.power(sigma_y,2)/2)))
+        up = front + back
+        down = sigma_y * np.power(T, 0.5)
+        d1 = up / down
+        d2 = d1 - down       
+        C = stock * stats.norm(0,1).cdf(d1.astype(float)) - K* np.exp((-1*r*T).astype(float)) * stats.norm(0,1).cdf(d2.astype(float))
+        C = especially_small(C)
+        return C
 
 #    @staticmethod
-#    def get_C1(stock, r, K, T):
-#        def get_sigma(stock): 
-#            stock_ln = np.log(stock)
-#            miu = stock_ln.diff()
-#            miu = miu.iloc[1:]
-#            miu_avr = miu.mean()
-#            total=0
-#            for i in range(len(miu)):
-#                total += np.power(miu.iloc[i] - miu_avr,2)
-#            sigma = np.sqrt(total/(len(miu)-1))
-#            sigma_total = sigma * np.sqrt(250)
-#            return sigma_total
-#        def especially_small(C):
-#            for i, item in enumerate(C.values.tolist()):
-#                if item < 1e-4:
-#                    C.iat[i] = 0
-#            return C
-#        def check_if_series(x):
-#            if type(x)!="<class 'pandas.core.frame.Series'>":
-#                x = pd.Series(index=x.index.values.tolist(),data=x.iloc[:,0])
-#            return x
-#        sigma_y = get_sigma(stock)
-#        K = check_if_series(K)
-#        up = np.log(stock / K) + T * (r + np.power(sigma_y,2)/2)
-#        down = sigma_y * np.sqrt(T)
-#        d1 = up / down
-#        d2 = d1 - down
-#        C = stock * stats.norm(0,1).cdf(d1) - K* np.exp(-1*r*T) * stats.norm(0,1).cdf(d2)
-#        C = especially_small(C)
-#        return C
-
-    @staticmethod
-    def get_C1(S0, K, r, T, sigma):             
-        def bsformula(callput, S0, K, r, T, sigma, q=0):
-            def norminv(x):
-                return ((1.0/math.sqrt(2.0*math.pi)) * math.exp(-x*x*0.5))
-            
-            def d1(S0, K, r, T, sigma, q):
-                deno = (sigma * math.sqrt(T))
-                if (deno==0):
-                    return 0
-                logReturns = math.log(S0/float(K)) if ((S0/float(K)) > 0.0) else 0.0
-                return (float(logReturns) + (float(r) - float(q) + float(sigma)*float(sigma)*0.5)*float(T)) / float(deno)
-                
-            def d2(S0, K, r, T, sigma, q):
-                    return d1(S0, K, r, T, sigma, q)-sigma*math.sqrt(T)
-            N = stats.norm.cdf
-                        
-            def optionValueOfCall(S0, K, r, T, sigma, q):       
-                _d1 = d1(S0, K, r, T, sigma, q)
-                _d2 = d2(S0, K, r, T, sigma, q)
-                return S0*math.exp(-q*T)*N(_d1)- K*math.exp(-r*T)*N(_d2)
-              
-            def optionValueOfPut(S0, K, r, T, sigma, q):
-                _d1 = d1(S0, K, r, T, sigma, q)
-                _d2 = d2(S0, K, r, T, sigma, q)
-                return float(K)*math.exp(-float(r)*float(T))*N(-_d2) - float(S0)*math.exp(-float(q)*float(T))*N(-_d1)
-                
-            def delta(callput, S0, K, r, T, sigma, q):
-                _d1 = d1(S0, K, r, T, sigma, q)        
-                if callput.lower() == "call":            
-                    return N(_d1) * math.exp(-q*T)
-                else:
-                    return (N(_d1)-1)* math.exp(-q*T)
-            
-            def vega(S0, K, r, T, sigma, q):
-                _d1 = d1(S0, K, r, T, sigma, q)
-                return S0  * math.sqrt(T) * norminv(_d1)  * math.exp(-q*T)
-            
-            if callput.lower()=="call":
-                optionValue = optionValueOfCall(S0, K, r, T, sigma, q)
-            else:
-                optionValue = optionValueOfPut(S0, K, r, T, sigma, q)
-                
-            _delta = delta(callput, S0, K, r, T, sigma, q)
-            _vega = vega(S0, K, r, T, sigma, q)
-            
-            return (optionValue, _delta, _vega)
-        return bsformula('call', S0, K, r, T, sigma, q=0)[0]
-
-    # @staticmethod
-    # def get_C2(#TODO):
-
-    #     return C2
+#    def get_C2(C0, ):
+#        '''得到纯债的价值C2, 是个时间序列数据。
+#        Args:
+#            C0: 债券的到期价值，单值数据
+#        '''
+#        return C2
     
-    @staticmethod
-    def get_C0(interest_list):
-        length = len(interest_list)
-        def f(l,n):
-            return l*np.power(1 + GetAttrs.rf, length - n)
-        total = 0 
-        for i, item in enumerate(interest_list):
-            total += f(item,i+1)
-        return total
         
     @staticmethod
     def get_Value_Series(K, stock):

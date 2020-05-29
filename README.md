@@ -35,8 +35,8 @@
 ![](asset/image-20200530013008868-0773878.png)
 
 ```python
-正股股(Stock_Price)...转股价值(Value_Series)...[折线图](htmlpreview.github.io/?output/StockPrice_ValueSeries.html)   
-```      
+正股股(Stock_Price)...转股价值(Value_Series)...[折线图](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html)   
+```
 
  ![正股股(Stock_Price)...转股价值(Value_Series)...折线图](asset/正股股(Stock_Price)...转股价值(Value_Series)...折线图.png) 
 
@@ -63,6 +63,12 @@
 |          我们设置90%转股价格点为 分界点           |
 |        分界点前pv+期权 分界点后是股价+期权        |
 | ~~行权价K我们选取不变的，后期再在时间序列上操作~~ |
+
+
+
+------
+
+## 问题列表
 
 以下数据可以自动获得或者可以爬取吗？
 

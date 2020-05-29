@@ -1,4 +1,5 @@
-# ConvertibleBond
+# Convertible_Bond.py
+## 计算可转债的纯债价值，期权价值。
 可转债研究
 
 ------

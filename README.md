@@ -1,6 +1,16 @@
 # Convertible_Bond.py
 ## 计算可转债的纯债价值，期权价值。
-可转债研究
+
+
+
+|                           函数结构                           |  注释  |
+| :----------------------------------------------------------: | :----: |
+| [Convertible_Bond](https://github.com/FinTechNJU/Bond/blob/master/Convertible_Bond.py) | 主程序 |
+| [Container](https://github.com/FinTechNJU/Bond/blob/master/Container.py) |  容器  |
+| [Adapter](https://github.com/FinTechNJU/Bond/blob/master/Adapter.py) | 适配器 |
+| [Function](https://github.com/FinTechNJU/Bond/blob/master/Function.py) |  函数  |
+
+
 
 ------
 

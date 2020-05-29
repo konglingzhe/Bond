@@ -1,3 +1,5 @@
+import concurrent
+import matplotlib.pyplot as plt
 class GlobalFunctions:
     @staticmethod
     def save_info(i):

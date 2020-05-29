@@ -79,8 +79,8 @@
 * 纯债的价值是递增的？？
 * 是的。因为两个到期价值一样的债券，更快到期的，获利能力更强，应该价值越大。
 
-![image-20200530013008868](/Users/terrystanley/Library/Application Support/typora-user-images/image-20200530013008868.png)
+![](asset/image-20200530013008868-0773878.png)
 
 ```python
-正股股(Stock_Price)...转股价值(Value_Series)...[折线图]()  
+正股股(Stock_Price)...转股价值(Value_Series)...[折线图]()   
 ```

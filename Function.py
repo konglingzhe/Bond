@@ -1,5 +1,6 @@
 # 以下是函数
 #import math
+from Adapter import GlobalFunctions
 import scipy.stats as stats
 import pandas as pd
 import numpy as np
@@ -9,6 +10,9 @@ class GetAttrs:
     rf = 0.022956 # 设置无风险利率，类属性
     @staticmethod
     def get_C0(interest_list):
+        '''债券到期的终值
+        #TODO根据付息日不同，应该有六个值 
+        '''
         length = len(interest_list)
         def f(l,n):
             return l*np.power(1 + GetAttrs.rf, length - n)
@@ -21,21 +25,26 @@ class GetAttrs:
         r = np.power(C0/100, 1/6) - 1
         return r 
     @staticmethod
-    def get_T(time_list):
-        ''' 这里要求股票的开始时间必须和债券的开始时间相同
+    def get_T(time_list, stock):
+        ''' 债券的存续时间序列
+        这里要求股票的开始时间必须和债券的开始时间相同
         Args:
             start_point_string: string, 债券开始的时间，eg: start_point_string = '2019-02-15'
             end_point_string: string, 债券结束时间，eg: end_point_string = '2025-02-15'
+            stock: dataframe[n*1], 用于数据对齐
+        Return:
+            pd.DataFrame: (存续天数 * 1), (columns = ['T']), 距离到期还有多少年
         '''
         start_point_string, end_point_string = time_list[0], time_list[1]
         date_index = pd.date_range(start_point_string, end_point_string).strftime('%Y-%m-%d')
         T = pd.DataFrame(index = date_index ,columns = ['T'])
         for i in range(T.shape[0]):
             T.iat[i,0] = (len(date_index)- (i+1))/365.333
+        T = GlobalFunctions.series_align(stock, T)
         return T
     @staticmethod
     def get_K(time_list, time_price_dict):
-        '''得到时间序列K
+        '''得到行权价的时间序列K
         Args:
             time_list: list, stock.index.values.tolist()
             time_price_dict: dict, {'2019-02-15':37.97, '2019-08-22':22.22}
@@ -87,15 +96,9 @@ class GetAttrs:
             if type(x) != pd.core.series.Series:
                 x = pd.Series(index=x.index.values.tolist(),data=x.iloc[:,0])
             return x            
-        def series_align(K, T):
-            '''让T的index保持与K对齐
-            '''
-            index_list = K.index.values.tolist()
-            T = T.reindex(index_list)
-            return T
         sigma_y = get_sigma(stock)
         K = check_if_series(K)
-        T = check_if_series(series_align(K, T))
+        T = check_if_series(GlobalFunctions.series_align(K, T))
         front = check_if_series(np.log(stock / K))
         back = check_if_series((T * (r + np.power(sigma_y,2)/2)))
         up = front + back
@@ -105,16 +108,17 @@ class GetAttrs:
         C = stock * stats.norm(0,1).cdf(d1.astype(float)) - K* np.exp((-1*r*T).astype(float)) * stats.norm(0,1).cdf(d2.astype(float))
         C = especially_small(C)
         return C
-
-#    @staticmethod
-#    def get_C2(C0, ):
-#        '''得到纯债的价值C2, 是个时间序列数据。
-#        Args:
-#            C0: 债券的到期价值，单值数据
-#        '''
-#        return C2
-    
-        
+    @staticmethod
+    def get_C2(C0, T):
+        '''得到纯债的价值C2, 是个时间序列数据。
+        Args:
+            C0: 债券的到期价值，单值数据
+            T: 整个债券的存续期
+        '''
+        C2 = pd.Series(index = T.index.values.tolist())
+        for i in range(T.shape[0]):
+            C2.iat[i] = C0 / np.power((1 + GetAttrs.rf), T.iloc[i,0])
+        return C2          
     @staticmethod
     def get_Value_Series(K, stock):
         Value_Series = (100/K) * stock

@@ -46,3 +46,23 @@ class GlobalFunctions:
     def show_info(i):
         GlobalFunctions.save_info(i)
         GlobalFunctions.draw_figure(i)
+    @staticmethod
+    def series_align(K, T):
+        '''让T的index保持与K对齐
+        模板在前，要对其的在后
+        '''
+        index_list = K.index.values.tolist()
+        T = T.reindex(index_list)
+        return T
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

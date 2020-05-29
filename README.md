@@ -32,7 +32,11 @@
 
 
 
-​      
+![](asset/image-20200530013008868-0773878.png)
+
+```python
+正股股(Stock_Price)...转股价值(Value_Series)...[折线图](htmlpreview.github.io/?output/StockPrice_ValueSeries.html)   
+```      
 
  ![正股股(Stock_Price)...转股价值(Value_Series)...折线图](asset/正股股(Stock_Price)...转股价值(Value_Series)...折线图.png) 
 
@@ -79,8 +83,4 @@
 * 纯债的价值是递增的？？
 * 是的。因为两个到期价值一样的债券，更快到期的，获利能力更强，应该价值越大。
 
-![](asset/image-20200530013008868-0773878.png)
 
-```python
-正股股(Stock_Price)...转股价值(Value_Series)...[折线图](htmlpreview.github.io/?https://github.com/FinTechNJU/Bond/blob/master/output/StockPrice_ValueSeries.html)   
-```

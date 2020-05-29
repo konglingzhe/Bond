@@ -21,18 +21,11 @@ class Bond:
     bond_name_list = []
     def __init__(self):
         self._attrs = {}
-        self.r = np.nan
-        self.T = np.nan
     def attr(self, name):
         if name not in self._attrs:
             self._attrs[name] = Attr()
         return self._attrs[name]    
-    def set_r(self, r):
-        self.r = r
-        return self.r
-    def set_T(self, T):
-        self.T = T
-        return self.T
+
 
 class Bondbook:
     def __init__(self):
@@ -67,7 +60,7 @@ class GetAtts:
         K = pd.DataFrame(index = time_list, data = [np.nan for i in range(len(time_list))])
         for key, value in time_price_dict.items():
             K.loc[key] = value
-        K.fillna(method='ffill')
+        K = K.fillna(method='ffill')
         return K
     @staticmethod
     def get_C1(stock, r, K, T):
@@ -81,34 +74,39 @@ class GetAtts:
                 total += np.power(miu.iloc[i] - miu_avr,2)
             sigma = np.sqrt(total/(len(miu)-1))
             sigma_total = sigma * np.sqrt(250)
-            return sigma, sigma_total
+            return sigma_total
         def especially_small(C):
             for i, item in enumerate(C.values.tolist()):
                 if item < 1e-4:
                     C.iat[i] = 0
             return C
-        sigma, sigma_y = get_sigma(stock)
-        up = np.log(stock / K) + T * (r - q + np.power(sigma,2)/2)
-        down = sigma * np.sqrt(T)
+        def check_if_series(x):
+            if type(x)!="<class 'pandas.core.frame.Series'>":
+                x = pd.Series(index=x.index.values.tolist(),data=x.iloc[:,0])
+            return x
+        sigma_y = get_sigma(stock)
+        K = check_if_series(K)
+        up = np.log(stock / K) + T * (r + np.power(sigma_y,2)/2)
+        down = sigma_y * np.sqrt(T)
         d1 = up / down
         d2 = d1 - down
         C = stock * stats.norm(0,1).cdf(d1) - K* np.exp(-1*r*T) * stats.norm(0,1).cdf(d2)
         C = especially_small(C)
         return C
-    @staticmethod
-    def get_C2(#TODO):
+    # @staticmethod
+    # def get_C2(#TODO):
 
-        return C2
+    #     return C2
     @staticmethod
     def get_C0(interest_list):
+        length = len(interest_list)
         def f(l,n):
-            return np.power(1 + rf,n)
+            return l*np.power(1 + rf, length - n)
         total = 0 
         for i, item in enumerate(interest_list):
-            l = item
-            n = i+1
-            total += f(l,n)
+            total += f(item,i+1)
         return total
+        
     @staticmethod
     def get_Value_Series(K, stock):
         Value_Series = (100/K) * stock
@@ -166,7 +164,7 @@ class GlobalFunctions:
         GlobalFunctions.save_info(i)
         GlobalFunctions.draw_figure(i)
     @staticmethod
-    def set_up(i, K):
+    def set_up(i, K_dict):
         # 初始化每一个债券
         # 从外部传入数据 TODO 改成函数，不要从文件中读取
         bond_price = dfRaw.iloc[:,i]
@@ -175,21 +173,20 @@ class GlobalFunctions:
         # 所有可转债
         bond1 = book.bond(bond_name)
         # 实例化一个可转债对象
-        bond1.attr('C0').add_value((GetAtts.get_C0(list1)))
+        bond1.attr('C0').add_value(GetAtts.get_C0(list1))
         # 设置债券到期价值C0的值
-        bond1.set_r(GetAtts.get_r(bond1.attr('C0').value))
-        bond1.set_T(stock)
-        # 传入r和T的值
+        bond1.attr('r').add_value(GetAtts.get_r(bond1.attr('C0').value))
         bond1.attr('T').add_value(GetAtts.get_T(stock))
-        bond1.attr('K').add_value(K)
-        bond1.attr('C1').add_value(GetAtts.get_C1(stock, bond1.r, K, bond1.T))
+        bond1.attr('K').add_value(GetAtts.get_K(stock.index.values.tolist(), K_dict)) 
+        # 设置期权的行权价K TODO
+        bond1.attr('C1').add_value(GetAtts.get_C1(stock, bond1.attr('r').value, bond1.attr('K').value, bond1.attr('T').value))
         # 设置期权价值C1 序列数据
-        bond1.attr('C2').add_value(GetAtts.get_C2(#TODO))
+        # bond1.attr('C2').add_value(GetAtts.get_C2(#TODO))
         # 设置期纯债价值C2 序列数据
         value = bond1.attr('C1').value + bond1.attr('C0').value
         bond1.attr('Arbitrage').add_value(value - bond_price)
         # 设置可转债的套利属性
-        bond1.attr('Value_Series').add_value(GetAtts.get_Value_Series(K, stock))
+        bond1.attr('Value_Series').add_value(GetAtts.get_Value_Series(bond1.attr('K').value, stock))
         # 设置可转债的转股价值
         bond1.attr('Premium_Rate').add_value(GetAtts.get_Premium_Rate(bond_price, bond1.attr('Value_Series').value))
         # 设置可转债的转股溢价率
@@ -204,19 +201,24 @@ if __name__=='__main__':
         dfRaw, dfRaw2 = GlobalFunctions.read_data()
     # 获得数据
 
-    q = 0 # q应该设置成什么我们也不知道
     rf = 0.022956 # 设置无风险利率
     book = Bondbook()
     # 设置可转债的基本指标
     # 对于所有可转债
 
     list1=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5] # 债券1的利息表
-    K1 = 37.97 # 债券1的行权价
+    # K1 = 37.97 # 债券1的行权价
+    K1_dict = {
+        '2019-02-15':37.97,
+        '2019-05-31':22.28,
+         '2020-05-22':22.22
+         }
+    # 债券1的行权价
     list2=[0.4, 0.6, 1.0, 1.6, 2.0, 112.5]
     K2 = 20.22 # 债券2的行权价
     # 对于每一个可转债
 
-    GlobalFunctions.set_up(0, K1)
+    GlobalFunctions.set_up(0, K1_dict)
     GlobalFunctions.show_info(0)
     print("Done")
 

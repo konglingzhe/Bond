@@ -63,7 +63,7 @@
 ## Figures
 ![pix](asset/pix.png)
 
-* 正股股(Stock_Price)转股价值(Value_Series)折线图 
+#### 正股股(Stock_Price)转股价值(Value_Series)折线图 
 
 ------
 

@@ -1,3 +1,4 @@
 # şöÂÔ.historyÎÄźţźĐ
 .history/
-.vscode/
+!.vscode/*
+!__pycache__/*

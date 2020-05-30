@@ -26,14 +26,8 @@
 |                     链接表格                      |
 | :---------------------------------------------------------: |
 |[可转债套利空间的示例](https://github.com/FinTechNJU/ConvertibleBond/blob/master/output/128054.SZ.csv)|
-|[代码地址: 计算可转债价值和生成以下两个图片(折线图和散点图), 点击此链接](https://github.com/FinTechNJU/Bond/blob/master/p1.py)  |
 |[打开图片有问题？ 点击获取我分享的免费VPN，适用于windows、macos和linux](https://github.com/FinTechNJU/Tutorial/issues/2)|
-
-
-
-![pix](asset/pix.png)
-
-* 正股股(Stock_Price) 转股价值(Value_Series) 折线图 -> [Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) <-
+|[Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) |
 
 
 
@@ -69,7 +63,7 @@
 ## Figures
 ![pix](asset/pix.png)
 
-* 正股股(Stock_Price) 转股价值(Value_Series) 折线图 -> [Python交互图链接地址](https://fintechnju.github.io/Bond/output/StockPrice_ValueSeries.html) <-
+* 正股股(Stock_Price)转股价值(Value_Series)折线图 
 
 ------
 

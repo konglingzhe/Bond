@@ -47,14 +47,17 @@ class SetUp:
         bond1.attr('K').add_value(GetAttrs.get_K(stock.index.values.tolist(), K_dict))
         # 设置期权的行权价K TODO 序列数据
 
-        bond1.attr('C1').add_value(GetAttrs.get_C1(stock, bond1.attr('r').value, bond1.attr('K').value, bond1.attr('T').value))
+        bond1.attr('C1').add_value(GetAttrs.get_C1(stock, bond1.attr('r').value, bond1.attr('K').value, bond1.attr('T').value, bond1.attr('sigma').value))
         # 设置期权价值C1 序列数据
 
         bond1.attr('C2').add_value(GetAttrs.get_C2(bond1.attr('C0').value, bond1.attr('T').value))
         # 设置期纯债价值C2 序列数据
 
-        bond1.attr('Arbitrage').add_value(bond1.attr('C1').value + bond1.attr('C0').value - bond_price)
+        bond1.attr('Arbitrage').add_value(bond1.attr('C1').value + bond1.attr('C2').value - bond_price)
         # 设置可转债的套利属性
+
+        bond1.attr('Bond_Value').add_value(GetAttrs.get_Bond_Value(bond1.attr('C1').value, bond1.attr('C2').value))
+        # 设置可转债的价值
 
         bond1.attr('Value_Series').add_value(GetAttrs.get_Value_Series(bond1.attr('K').value, stock))
         # 设置可转债的转股价值

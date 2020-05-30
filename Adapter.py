@@ -62,7 +62,7 @@ class GlobalFunctions:
     @staticmethod
     def save_info(book, i):
         bond_name = Bond.bond_name_list[i]
-        book.bond(bond_name).attr('Arbitrage').value.to_csv('./output/'+bond_name+'.csv',mode='w+')
+        book.bond(bond_name).attr('Arbitrage').value.to_csv('./output/'+'Arbitrage_'+bond_name+'.csv',mode='w+')
         print('Function: save_info ... Done!')
         # 可转债的套利空间保存为csv文件
     @staticmethod

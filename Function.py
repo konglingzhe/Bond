@@ -59,6 +59,8 @@ class GetAttrs:
         '''获得股票的波动率，序列数据
         Args:
             stock_df: 正股的收盘价
+        Returns:
+            股票的年波动率
         '''
         stock_ln_df = np.log(stock_df)
         miu = stock_ln_df.diff().fillna(method='bfill')
@@ -71,27 +73,18 @@ class GetAttrs:
                 total += np.power(temp_miu.iloc[j] - temp_miu_avr, 2)
             total = np.sqrt(total/(len(temp_miu) - 1))
             sigma_df.iat[i,0] = total
-        return sigma_df.fillna(method='bfill')
+            sigma_df = sigma_df.fillna(method='bfill')
+        sigma_df = sigma_df * np.sqrt(240)
+        return sigma_df
 
     @staticmethod
-    def get_C1(stock, r, K, T):
-        def get_sigma(stock):
-            stock_ln = np.log(stock)
-            miu = stock_ln.diff()
-            miu = miu.iloc[1:]
-            miu_avr = miu.mean()
-            total=0
-            for i in range(len(miu)):
-                total += np.power(miu.iloc[i] - miu_avr,2)
-            sigma = np.sqrt(total/(len(miu)-1))
-            sigma_total = sigma * np.sqrt(250)
-            return sigma_total
+    def get_C1(stock, r, K, T, sigma):
         def especially_small(C):
             for i, item in enumerate(C.values.tolist()):
                 if item < 1e-4:
                     C.iat[i] = 0
             return C
-        sigma_y = get_sigma(stock)
+        sigma_y = GlobalFunctions.check_if_series(sigma)
         K = GlobalFunctions.check_if_series(K)
         T = GlobalFunctions.check_if_series(GlobalFunctions.series_align(K, T))
         front = GlobalFunctions.check_if_series(np.log(stock / K))
@@ -116,6 +109,21 @@ class GetAttrs:
         return C2
     @staticmethod
     def get_Value_Series(K, stock):
+        '''设置可转债的转股价值
+        (100/转股价格) * 正股价格
+        Parameters
+        ----------
+        K : dataframe
+            可转债的转股价.
+        stock : datframe
+            正股的股价.
+
+        Returns
+        -------
+        Value_Series : dataframe
+            可转债的转股价值.
+
+        '''
         K = GlobalFunctions.check_if_series(K)
         Value_Series = (100/K) * stock
         return Value_Series
@@ -123,3 +131,23 @@ class GetAttrs:
     def get_Premium_Rate(bond_price, Value_Series):
         Premium_Rate = (bond_price - Value_Series)/ Value_Series
         return Premium_Rate
+    @staticmethod
+    def get_Bond_Value(C1, C2):
+        '''
+        计算可转债的价值
+        纯债价值 + 期权价值
+        Parameters
+        ----------
+        C1 : DataFrame
+            期权价值.
+        C2 : DataFrame
+            纯债价值.
+
+        Returns
+        -------
+        Bond_Value : DataFrame
+            可转债价值.
+
+        '''
+        Bond_Value = C1 + C2
+        return Bond_Value

@@ -51,13 +51,6 @@
 |      要用510050.SH的作为标的资产       |
 | 50ETF购四月2.65 四月份到期，行权价2.65 |
 
-------
-
-## Wiki
-
-* 价内期权是具有内在价值的期权。期权持有人行权时，对[看涨期权](https://www.baidu.com/s?wd=看涨期权&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)而言，行权价格低于标的证券结算价格；对看跌期权而言，标的证券结算价格低于行权价格。
-
-* 价外期权一般指虚值期权，是指不具有内涵价值的期权，即敲定价高于当时[期货价格](https://www.baidu.com/s?wd=期货价格&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)的[看涨期权](https://www.baidu.com/s?wd=看涨期权&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)或敲定价低于当时[期货价格](https://www.baidu.com/s?wd=期货价格&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)的看跌期权。如果把企业的[股权资本](https://www.baidu.com/s?wd=股权资本&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao)看作是一种买方期权，则标的资产即是企业的总资产，而企业的负债值可看作是期权合约上的约定价。期权的有效期即与负债的期限相同。
 
 
 

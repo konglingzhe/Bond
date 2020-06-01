@@ -1,8 +1,8 @@
-# Convertible_Bond.py
-## 计算可转债的纯债价值，期权价值。
+<h2 align="center">Convertible_Bond.py</h2>
+<h3 align = 'center'>计算可转债的纯债价值，期权价值。</h2>
 
 
-
+<p align = 'center'>
 |                           函数结构                           |  注释  |
 | :----------------------------------------------------------: | :----: |
 | [Convertible_Bond](https://github.com/FinTechNJU/Bond/blob/master/Convertible_Bond.py) | 主程序 |
@@ -10,7 +10,7 @@
 | [Adapter](https://github.com/FinTechNJU/Bond/blob/master/Adapter.py) | 适配器 |
 | [Function](https://github.com/FinTechNJU/Bond/blob/master/Function.py) |  函数  |
 
-
+</p>
 
 ------
 
@@ -34,6 +34,9 @@
 --------------
 ## TODO
 
+<details>
+  <summary>事情列表</summary>
+
 |                 5月29日 事情列表                  |
 | :-----------------------------------------------: |
 |                   ~~把rf改掉~~                    |
@@ -54,23 +57,5 @@
 | 6月1日事情列表     |
 | ------------------ |
 | 加入yield 读取数据 |
-|                    |
-|                    |
-
-
-
-## 案例展示
-
-<details>
-  <summary>案例展示</summary>
-
-- [中文诗歌主页](https://shici.store)是一个基于浏览器的诗词网站，包含唐诗三百首、宋词三百首等文集。
-- [animalize](https://github.com/animalize) **/** [QuanTangshi](https://github.com/animalize/QuanTangshi)  *离线全唐诗 Android*
-- [justdark](https://github.com/justdark) **/** [pytorch-poetry-gen](https://github.com/justdark/pytorch-poetry-gen)  *a char-RNN based on pytorch*
-- [Clover27](https://github.com/Clover27) **/** [ancient-Chinese-poem-generator](https://github.com/Clover27/ancient-Chinese-poem-generator)  *Ancient-Chinese-Poem-Generator*
-- [chinese-poetry](https://github.com/chinese-poetry) **/** [poetry-calendar](http://shici.store/poetry-calendar/)  *诗词周历*
-- [chenyuntc](https://github.com/chenyuntc) **/** [pytorch-book](https://github.com/chenyuntc/pytorch-book/blob/master/chapter9-神经网络写诗(CharRNN)/) *简体唐诗生成(char-RNN)，可生成藏头诗，自定义诗歌意境，前缀等*
-- [okcy1016](https://github.com/okcy1016) **/** [poetry-desktop](https://github.com/okcy1016/poetry-desktop/) *诗词桌面*
-- [huangjianke](https://github.com/huangjianke) **/** [weapp-poem](https://github.com/huangjianke/weapp-poem/) *诗词墨客 小程序版*
 
 </details>

@@ -69,7 +69,7 @@ class GlobalFunctions:
     def read_data():
         name_list = ['excel1', 'excel2']
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(name_list)) as executor: # 并行读入文件
-            results = list(executor.map(lambda file_name: pd.read_csv('./'+file_name+'.csv',encoding='gbk').set_index('DateTime'), name_list))
+            results = list(executor.map(lambda file_name: pd.read_csv('./input/'+file_name+'.csv',encoding='gbk').set_index('DateTime'), name_list))
         dfRaw, dfRaw2 = results[0], results[1]
         return dfRaw, dfRaw2
     @staticmethod

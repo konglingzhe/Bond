@@ -74,7 +74,7 @@ class GetAttrs:
             total = np.sqrt(total/(len(temp_miu) - 1))
             sigma_df.iat[i,0] = total
             sigma_df = sigma_df.fillna(method='bfill')
-        sigma_df = sigma_df * np.sqrt(240)
+        sigma_df = sigma_df * np.sqrt(250)
         return sigma_df
 
     @staticmethod

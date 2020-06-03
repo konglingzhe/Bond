@@ -1,4 +1,4 @@
-# şöÂÔ.historyÎÄźţźĐ
 .history/
 !.vscode/*
 !__pycache__/*
+*.pyc

@@ -1,7 +1,8 @@
-# Convertible_Bond.py
-## 计算可转债的纯债价值，期权价值。
+<h2 align="center">Convertible_Bond.py</h2>
+<h3 align = 'center'>计算可转债的纯债价值，期权价值。</h2>
 
 
+<p align = 'center'>
 
 |                           函数结构                           |  注释  |
 | :----------------------------------------------------------: | :----: |
@@ -10,7 +11,7 @@
 | [Adapter](https://github.com/FinTechNJU/Bond/blob/master/Adapter.py) | 适配器 |
 | [Function](https://github.com/FinTechNJU/Bond/blob/master/Function.py) |  函数  |
 
-
+</p>
 
 ------
 
@@ -34,6 +35,9 @@
 --------------
 ## TODO
 
+<details>
+  <summary>事情列表</summary>
+
 |                 5月29日 事情列表                  |
 | :-----------------------------------------------: |
 |                   ~~把rf改掉~~                    |
@@ -51,6 +55,9 @@
 |      要用510050.SH的作为标的资产       |
 | 50ETF购四月2.65 四月份到期，行权价2.65 |
 
+| 6月1日事情列表     |
+| ------------------ |
+| 加入yield 读取数据 |
 
 
 比较一下 有时分秒后缀的datetime和没有的是不是同一个。
@@ -58,3 +65,4 @@
 
 
 
+</details>
